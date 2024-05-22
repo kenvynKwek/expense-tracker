@@ -34,3 +34,25 @@ expensesRoute.post("/", zValidator("json", createPostSchema), async (c) => {
     fakeExpenses.push({...expense, id: fakeExpenses.length + 1})
     return c.json(expense);
 });
+
+// output expense based on id in URL eg. api/expense/1
+// by default, whatever is after expense/ is a string, use regex to check its a number before parseInt
+expensesRoute.get('/:id{[0-9]+}', (c) => {
+    const id = Number.parseInt(c.req.param('id'));
+    const expense = fakeExpenses.find(expense => expense.id === id);
+    if (!expense) {
+        return c.notFound();
+    }
+    return c.json(expense);
+});
+
+expensesRoute.delete('/:id{[0-9]+}', (c) => {
+    const id = Number.parseInt(c.req.param('id'));
+    const index = fakeExpenses.findIndex(expense => expense.id === id);
+    if (index === -1) {
+        return c.notFound();
+    }
+
+    const deletedExpense = fakeExpenses.splice(index, 1)[0];
+    return c.json({ expense: deletedExpense });
+});
