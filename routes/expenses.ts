@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 
 export const expensesRoute = new Hono();
@@ -16,7 +17,7 @@ const fakeExpenses: Expense[] = [
     { id: 3, title: "Rent", amount: 1000 }
 ];
 
-// for validating if retrieved data is the correct data type
+// validate if retrieved data is the correct data type
 const createPostSchema = z.object({
     title: z.string().min(3).max(100),
     amount: z.number().int().positive()
@@ -28,9 +29,8 @@ expensesRoute.get("/", (c) => {
 });
 
 // output the info somewhere
-expensesRoute.post("/", async (c) => {
-    const data = await c.req.json();
-    const expense = createPostSchema.parse(data); // check data type
-    console.log({expense}); // to see output
+expensesRoute.post("/", zValidator("json", createPostSchema), async (c) => {
+    const expense = await c.req.valid("json");
+    fakeExpenses.push({...expense, id: fakeExpenses.length + 1})
     return c.json(expense);
 });
