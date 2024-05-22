@@ -4,11 +4,17 @@ import { z } from 'zod';
 
 export const expensesRoute = new Hono();
 
-type Expense = {
-    id: number,
-    title: string,
-    amount: number
-};
+// use zod instead of writing new typescript object
+const expenseSchema = z.object({
+    id: z.number().int().positive().min(1),
+    title: z.string().min(3).max(100),
+    amount: z.number().int().positive()
+});
+
+type Expense = z.infer<typeof expenseSchema>;
+
+// createPostSchema is expenseSchema but without id
+const createPostSchema = expenseSchema.omit({ id: true });
 
 // dummy data
 const fakeExpenses: Expense[] = [
@@ -16,12 +22,6 @@ const fakeExpenses: Expense[] = [
     { id: 2, title: "Utilities", amount: 100 },
     { id: 3, title: "Rent", amount: 1000 }
 ];
-
-// validate if retrieved data is the correct data type
-const createPostSchema = z.object({
-    title: z.string().min(3).max(100),
-    amount: z.number().int().positive()
-});
 
 // get data
 expensesRoute.get("/", (c) => {
@@ -32,6 +32,7 @@ expensesRoute.get("/", (c) => {
 expensesRoute.post("/", zValidator("json", createPostSchema), async (c) => {
     const expense = await c.req.valid("json");
     fakeExpenses.push({...expense, id: fakeExpenses.length + 1})
+    c.status(201);
     return c.json(expense);
 });
 
