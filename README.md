@@ -18,6 +18,7 @@ Frontend
 
 Styles
 - [tailwind](https://tailwindcss.com/)
+- [shadcn](https://ui.shadcn.com/) components library reference
 
 Query/Router/Form
 - [Tanstack](https://tanstack.com/)
