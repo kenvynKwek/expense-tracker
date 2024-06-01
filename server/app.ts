@@ -10,6 +10,6 @@ app.get("/test", c => {
     return c.text("test page")
 });
 
-app.route("/api/expenses", expensesRoute); // routes localhost:3000/api/expenses to expensesRoute.ts
+app.route("/api/expenses", expensesRoute); // routes localhost:3000/api/expenses to expensesRoute (/routes/expenses.ts)
 
 export default app; // for Cloudflare Workers or Bun

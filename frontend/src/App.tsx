@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
 function App() {
   const [totalSpent, setTotalSpent] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/expenses/total-spent")
+  }, [])
 
   return (
     <Card className="w-[350px] m-auto">
@@ -20,9 +23,6 @@ function App() {
     <CardContent>
       <p>{totalSpent}</p>
     </CardContent>
-    <CardFooter>
-      <p>Card Footer</p>
-    </CardFooter>
     </Card>
   );
 }
