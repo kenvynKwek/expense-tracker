@@ -10,4 +10,12 @@ export default defineConfig({
       "@": path.resolve(import.meta.dir, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000", // any requests sent to /api will be forwarded to localhost:3000 (backend)
+        changeOrigin: true,
+      },
+    },
+  },
 })
