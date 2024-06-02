@@ -2,8 +2,6 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 
-export const expensesRoute = new Hono();
-
 // use zod instead of writing new typescript object
 const expenseSchema = z.object({
     id: z.number().int().positive().min(1),
@@ -23,31 +21,29 @@ const fakeExpenses: Expense[] = [
     { id: 3, title: "Rent", amount: 1000 }
 ];
 
-// get data
-expensesRoute.get("/", (c) => {
+export const expensesRoute = new Hono()
+.get("/", (c) => {
+    // get data
     return c.json({ expenses: fakeExpenses});
-});
-
-// output the info somewhere
-expensesRoute.post("/", zValidator("json", createPostSchema), async (c) => {
+})
+.post("/", zValidator("json", createPostSchema), async (c) => {
+    // output the info somewhere
     const expense = await c.req.valid("json");
     fakeExpenses.push({...expense, id: fakeExpenses.length + 1})
     c.status(201);
     return c.json(expense);
-});
-
-// output expense based on id in URL eg. api/expense/1
-// by default, whatever is after expense/ is a string, use regex to check its a number before parseInt
-expensesRoute.get('/:id{[0-9]+}', (c) => {
+})
+.get('/:id{[0-9]+}', (c) => {
+    // output expense based on id in URL eg. api/expense/1
+    // by default, whatever is after expense/ is a string, use regex to check its a number before parseInt
     const id = Number.parseInt(c.req.param('id'));
     const expense = fakeExpenses.find(expense => expense.id === id);
     if (!expense) {
         return c.notFound();
     }
     return c.json(expense);
-});
-
-expensesRoute.delete('/:id{[0-9]+}', (c) => {
+})
+.delete('/:id{[0-9]+}', (c) => {
     const id = Number.parseInt(c.req.param('id'));
     const index = fakeExpenses.findIndex(expense => expense.id === id);
     if (index === -1) {
@@ -56,9 +52,8 @@ expensesRoute.delete('/:id{[0-9]+}', (c) => {
 
     const deletedExpense = fakeExpenses.splice(index, 1)[0];
     return c.json({ expense: deletedExpense });
-});
-
-expensesRoute.get('/total-spent', (c) => {
+})
+.get('/total-spent', (c) => {
     const total = fakeExpenses.reduce((acc, expense) => acc + expense.amount, 0);
     return c.json({ total });
 })
